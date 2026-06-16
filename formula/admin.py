@@ -68,7 +68,7 @@ from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationFo
 from unfold.paginator import InfinitePaginator
 from unfold.sections import TableSection, TemplateSection
 from unfold.widgets import (
-    UnfoldAdminCheckboxSelectMultiple,
+    UnfoldAdminCheckboxSelectMultipleWidget,
     UnfoldAdminColorInputWidget,
     UnfoldAdminSelect2Widget,
     UnfoldAdminSelectWidget,
@@ -602,7 +602,7 @@ class DriverAdminForm(forms.ModelForm):
             ("TALENTED", _("Talented")),
         ],
         required=False,
-        widget=UnfoldAdminCheckboxSelectMultiple,
+        widget=UnfoldAdminCheckboxSelectMultipleWidget,
     )
     first_name = forms.CharField(
         label=_("First name"),
