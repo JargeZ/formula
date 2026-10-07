@@ -1,0 +1,42 @@
+version: "3"
+
+env:
+  DEBUG: "1"
+  ALLOWED_HOSTS: localhost,127.0.0.1
+
+tasks:
+  install:
+    desc: Install Python and Node dependencies
+    cmds:
+      - poetry install --no-root
+      - npm ci
+    sources:
+      - poetry.lock
+      - package-lock.json
+
+  css:
+    desc: Build Tailwind styles
+    cmds:
+      - npm run tailwind:build
+
+  seed:
+    desc: Create the database and load sample data (login demo/demo)
+    cmds:
+      - poetry run python manage.py migrate --noinput
+      - poetry run python manage.py loaddata formula/fixtures/*
+    status:
+      - test -f database.sqlite
+
+  start:
+    desc: Run the development server
+    cmds:
+      - poetry run python manage.py migrate --noinput
+      - poetry run python manage.py runserver {{.CLI_ARGS | default "127.0.0.1:8000"}}
+
+  run:
+    desc: Install, seed and start the project
+    cmds:
+      - task: install
+      - task: css
+      - task: seed
+      - task: start

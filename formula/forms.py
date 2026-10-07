@@ -8,7 +8,7 @@ from django.views.generic import RedirectView
 from unfold.forms import AuthenticationForm
 from unfold.layout import Submit
 from unfold.widgets import (
-    UnfoldAdminCheckboxSelectMultiple,
+    UnfoldAdminCheckboxSelectMultipleWidget,
     UnfoldAdminDateWidget,
     UnfoldAdminEmailInputWidget,
     UnfoldAdminExpandableTextareaWidget,
@@ -112,7 +112,7 @@ class CustomFormMixin(forms.Form):
         ],
         required=True,
         help_text=_("Select the category of your message"),
-        widget=UnfoldAdminCheckboxSelectMultiple,
+        widget=UnfoldAdminCheckboxSelectMultipleWidget,
     )
     priority = forms.TypedChoiceField(
         label=_("Priority"),
