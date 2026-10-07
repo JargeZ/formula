@@ -13,11 +13,7 @@ class ReadonlyExceptionHandlerMiddleware:
         return response
 
     def process_exception(self, request, exception):
-        if (
-            exception
-            and repr(exception)
-            == "ReadonlyException('Database is operating in readonly mode. Not possible to save any data.')"
-        ):
+        if "readonly" in str(exception):
             messages.warning(
                 request,
                 _(

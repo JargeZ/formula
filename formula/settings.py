@@ -127,6 +127,12 @@ DATABASES = {
     },
 }
 
+# Demo mode: the database is baked into the image and opened as immutable.
+DATABASE_READONLY = environ.get("DATABASE_READONLY") == "1"
+
+if DATABASE_READONLY:
+    DATABASES["default"]["NAME"] = f"file:{DATABASES['default']['NAME']}?immutable=1"
+
 ######################################################################
 # Authentication
 ######################################################################

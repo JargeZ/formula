@@ -40,3 +40,31 @@ tasks:
       - task: css
       - task: seed
       - task: start
+
+  demo:create:
+    desc: Create the Fly app (once)
+    cmds:
+      - fly apps create django-formula-admin-agentic --org personal
+    status:
+      - fly status >/dev/null 2>&1
+
+  demo:secrets:
+    desc: Set a stable SECRET_KEY on Fly (once)
+    deps: [demo:create]
+    cmds:
+      - fly secrets set --stage SECRET_KEY="$(openssl rand -hex 32)"
+    status:
+      - fly secrets list | grep -q SECRET_KEY
+
+  demo:build:
+    desc: Build the Fly image locally to check it
+    cmds:
+      - docker build -f fly.Dockerfile -t formula-demo .
+      - docker image ls formula-demo
+
+  demo:deploy:
+    desc: Deploy the read-only demo to Fly (single machine, scale to zero)
+    deps: [demo:secrets]
+    cmds:
+      - fly deploy --ha=false
+      - fly scale count 1 --yes

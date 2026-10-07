@@ -8,12 +8,10 @@ venv
 node_modules
 dist/
 .env
-fly.toml
 .vscode
 static
 media
 requirements.txt
-.dockerignore
 *.sqlite
 unfold_studio
 docker-compose.dev.yml

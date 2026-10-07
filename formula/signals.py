@@ -6,7 +6,7 @@ from formula.exceptions import ReadonlyException
 
 
 def prevent_modifications(sender, instance, **kwargs):
-    if not settings.DEBUG and sender._meta.db_table != "studio_options":
+    if settings.DATABASE_READONLY and sender._meta.db_table != "studio_options":
         raise ReadonlyException(
             "Database is operating in readonly mode. Not possible to save any data."
         )
