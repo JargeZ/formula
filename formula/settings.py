@@ -1,3 +1,4 @@
+import logging
 import shutil
 from collections import OrderedDict
 from datetime import date, datetime, time, timedelta
@@ -86,6 +87,8 @@ if environ.get("UNFOLD_STUDIO") == "1":
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    # After whitenoise: static files are not logged
+    "request_logging.middleware.LoggingMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -714,10 +717,38 @@ if environ.get("SECURE_PROXY_SSL_HEADER") == "1":
     USE_X_FORWARDED_HOST = True
 
 # Without this, DEBUG=False sends tracebacks only to mail_admins.
+# django-request-logging: one line per request ("GET /path?query - 200"), no bodies or headers.
+# Exceptions keep their traceback through the "django.request" logger -> root.
+REQUEST_LOGGING_ENABLE_COLORIZE = False
+REQUEST_LOGGING_DATA_LOG_LEVEL = logging.DEBUG
+REQUEST_LOGGING_HTTP_4XX_LOG_LEVEL = logging.INFO
+DJANGO_REQUEST_LOGGING_LOGGER_NAME = "request_log"
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "filters": {
+        # The middleware also logs the request line and, for 5xx, bodies at ERROR: keep only the response line
+        "response_line_only": {
+            "()": "django.utils.log.CallbackFilter",
+            "callback": lambda record: record.levelno == logging.INFO
+            and getattr(record, "response", None) is not None,
+        },
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
+        "request_console": {
+            "class": "logging.StreamHandler",
+            "filters": ["response_line_only"],
+        },
+    },
+    "loggers": {
+        "request_log": {
+            "handlers": ["request_console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
     "root": {"handlers": ["console"], "level": "WARNING"},
 }
 

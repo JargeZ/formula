@@ -803,6 +803,21 @@ exchange = ["certifi"]
 test = ["django-stubs", "mixer", "mypy", "pytest (>=8.2,<8.3)", "pytest-cov", "pytest-django"]
 
 [[package]]
+name = "django-request-logging"
+version = "0.7.5"
+description = "Django middleware that logs http request body."
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "django-request-logging-0.7.5.tar.gz", hash = "sha256:94934d77c2d0fd76fdb9879b874368aa7d55672f0c7e1f59dd39b991c3e123b4"},
+    {file = "django_request_logging-0.7.5-py2.py3-none-any.whl", hash = "sha256:4d9e520842303aaf654c6ffd39831b04513ea343574f8579a59ada46ffb95fb6"},
+]
+
+[package.dependencies]
+Django = "*"
+
+[[package]]
 name = "django-simple-history"
 version = "3.10.1"
 description = "Store model history and view/revert changes from admin site."
@@ -871,7 +886,7 @@ pydantic = ">=2.0"
 type = "git"
 url = "https://github.com/JargeZ/django-unfold-agentic-layer.git"
 reference = "HEAD"
-resolved_reference = "651476a2aef0f84f1b65d60adefd83903478c004"
+resolved_reference = "efba9be50e380bece278fd9b55302d6e78e6645f"
 subdirectory = "packages/django-unfold-agentic-layer"
 
 [[package]]
@@ -2940,4 +2955,4 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "8619e42b003ed080b0a96684cd24ec90d6b79ed408e250528d9011b540ac1640"
+content-hash = "955ecee6bf551a2a04f4ab710cebb98ba28ed97d3ec5e98049e406c110470cfc"
