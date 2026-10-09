@@ -24,6 +24,10 @@ gunicorn = "^23.0"
 pillow = "^12.0"
 sentry-sdk = { extras = ["django"], version = "^2.43" }
 pygments = "^2.19"
+django-hijack = "^3.7.9"
+django-waffle = "^5.0.0"
+django-unfold-agentic-layer = {git = "https://github.com/JargeZ/django-unfold-agentic-layer.git", subdirectory = "packages/django-unfold-agentic-layer"}
+django-request-logging = "^0.7.5"
 
 [tool.ruff]
 fix = true

@@ -35,5 +35,10 @@
         {% else %}
             {% include "formula/dashboards.html" %}
         {% endif %}
+    {% elif request.GET.dashboard == "django" %}
+        {% include "unfold/helpers/dashboard_default.html" %}
+    {% else %}
+        {% include "demo/dashboards/studio_stub.html" %}
+        {% include "demo/dashboards/default.html" %}
     {% endif %}
 {% endblock %}

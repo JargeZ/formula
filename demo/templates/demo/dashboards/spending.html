@@ -1,0 +1,33 @@
+{% extends "demo/dashboards/base.html" %}
+
+{% load i18n unfold %}
+
+{% block dashboard %}
+    <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        {% for tile in tiles %}
+            {% component "unfold/components/card.html" %}
+                {% component "unfold/components/text.html" %}{{ tile.title }}{% endcomponent %}
+                {% component "unfold/components/title.html" %}{{ tile.value }}{% endcomponent %}
+            {% endcomponent %}
+        {% endfor %}
+    </div>
+
+    {% blocktrans asvar footer %}Monthly growth {{ growth }}%{% endblocktrans %}
+
+    <div class="grid gap-8 lg:grid-cols-3">
+        {% trans "Revenue by category" as title %}
+        {% component "unfold/components/card.html" with title=title footer=footer %}
+            {% include "demo/dashboards/chart.html" with type="doughnut" data=category_chart %}
+        {% endcomponent %}
+
+        {% trans "Orders by weekday" as title %}
+        {% component "unfold/components/card.html" with title=title footer=footer %}
+            {% include "demo/dashboards/chart.html" with type="radar" data=weekday_chart %}
+        {% endcomponent %}
+
+        {% trans "Revenue by country" as title %}
+        {% component "unfold/components/card.html" with title=title footer=footer %}
+            {% include "demo/dashboards/chart.html" with type="pie" data=country_chart %}
+        {% endcomponent %}
+    </div>
+{% endblock %}

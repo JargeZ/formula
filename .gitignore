@@ -15,3 +15,5 @@ requirements.txt
 *.sqlite
 unfold_studio
 docker-compose.dev.yml
+.cache/
+*.md

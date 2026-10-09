@@ -10,10 +10,14 @@ urlpatterns = (
     [
         path("", HomeView.as_view(), name="home"),
         path("i18n/", include("django.conf.urls.i18n")),
-        path("__debug__/", include("debug_toolbar.urls")),
+        path("hijack/", include("hijack.urls")),
+        path("", include("django_unfold_agentic_layer.urls")),
     ]
     + i18n_patterns(
         path("admin/", admin.site.urls),
     )
     + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 )
+
+if settings.DEBUG:
+    urlpatterns += [path("__debug__/", include("debug_toolbar.urls"))]

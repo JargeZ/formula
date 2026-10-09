@@ -29,6 +29,7 @@ from django_celery_beat.models import (
 )
 from djangoql.admin import DjangoQLSearchMixin
 from guardian.admin import GuardedModelAdmin
+from hijack.contrib.admin import HijackUserAdminMixin
 from import_export.admin import ExportActionModelAdmin, ImportExportModelAdmin
 from modeltranslation.admin import TabbedTranslationAdmin
 from simple_history.admin import SimpleHistoryAdmin
@@ -222,7 +223,7 @@ class ConstructorDataset(BaseDataset):
 
 
 @admin.register(User)
-class UserAdmin(BaseUserAdmin, ModelAdmin):
+class UserAdmin(HijackUserAdminMixin, BaseUserAdmin, ModelAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
@@ -258,7 +259,12 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
         (
             _("Personal info"),
             {
-                "fields": (("first_name", "last_name"), "email", "biography"),
+                "fields": (
+                    ("first_name", "last_name"),
+                    "email",
+                    "biography",
+                    "location",
+                ),
                 "classes": ["tab"],
             },
         ),

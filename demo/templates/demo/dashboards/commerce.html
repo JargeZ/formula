@@ -1,0 +1,32 @@
+{% extends "demo/dashboards/base.html" %}
+
+{% load i18n unfold %}
+
+{% block dashboard %}
+    {% trans "Revenue, last 30 days" as title %}
+    {% component "unfold/components/card.html" with title=title %}
+        {% component "unfold/components/chart/line.html" with data=revenue_chart height=260 %}{% endcomponent %}
+    {% endcomponent %}
+
+    <div class="grid gap-8 lg:grid-cols-3">
+        <div class="lg:col-span-2">
+            {% trans "Product performance" as title %}
+            {% include "demo/dashboards/table.html" with table=products %}
+        </div>
+
+        {% trans "The most trending products in last 2 weeks" as title %}
+        {% include "demo/dashboards/progress.html" with items=trending %}
+    </div>
+
+    <div class="grid gap-8 lg:grid-cols-2">
+        {% trans "Orders by status" as title %}
+        {% component "unfold/components/card.html" with title=title %}
+            {% component "unfold/components/chart/bar.html" with data=status_chart height=260 %}{% endcomponent %}
+        {% endcomponent %}
+
+        {% trans "Revenue by category" as title %}
+        {% component "unfold/components/card.html" with title=title %}
+            {% component "unfold/components/chart/bar.html" with data=category_chart height=260 %}{% endcomponent %}
+        {% endcomponent %}
+    </div>
+{% endblock %}

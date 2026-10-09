@@ -3,6 +3,8 @@ version: "3"
 env:
   DEBUG: "1"
   ALLOWED_HOSTS: localhost,127.0.0.1
+  LOGIN_USERNAME: demo
+  LOGIN_PASSWORD: unfold123
 
 tasks:
   install:
@@ -20,12 +22,17 @@ tasks:
       - npm run tailwind:build
 
   seed:
-    desc: Create the database and load sample data (login demo/demo)
+    desc: Create the database and fill it with demo data (login demo/unfold123)
     cmds:
       - poetry run python manage.py migrate --noinput
-      - poetry run python manage.py loaddata formula/fixtures/*
+      - poetry run python manage.py seed
     status:
       - test -f database.sqlite
+
+  test:
+    desc: Run tests (DEBUG is required, otherwise the database is readonly)
+    cmds:
+      - poetry run python manage.py test --debug-mode
 
   start:
     desc: Run the development server

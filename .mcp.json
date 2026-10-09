@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "fly-demo": {
+      "type": "http",
+      "url": "https://django-formula-admin-agentic.fly.dev/mcp"
+    }
+  }
+}

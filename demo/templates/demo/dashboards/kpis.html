@@ -1,0 +1,12 @@
+{% load unfold %}
+
+<div class="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
+    {% for item in kpis %}
+        {% component "unfold/components/card.html" %}
+            {% component "unfold/components/text.html" %}{{ item.title }}{% endcomponent %}
+            {% component "unfold/components/title.html" %}
+                {% include "formula/helpers/kpi_progress.html" with total=item.total progress=item.progress percentage=item.percentage %}
+            {% endcomponent %}
+        {% endcomponent %}
+    {% endfor %}
+</div>

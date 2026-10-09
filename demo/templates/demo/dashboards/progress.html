@@ -1,0 +1,11 @@
+{% load unfold %}
+
+{% component "unfold/components/card.html" with title=title %}
+    <div class="flex flex-col gap-6">
+        {% for item in items %}
+            {% with percent=item.value|stringformat:"s"|add:"%" %}
+                {% component "unfold/components/progress.html" with title=item.title description=item.description|default:percent value=item.value %}{% endcomponent %}
+            {% endwith %}
+        {% endfor %}
+    </div>
+{% endcomponent %}
