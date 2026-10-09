@@ -16,3 +16,4 @@ requirements.txt
 unfold_studio
 docker-compose.dev.yml
 .cache/
+*.md
