@@ -12,6 +12,7 @@ urlpatterns = (
         path("i18n/", include("django.conf.urls.i18n")),
         path("hijack/", include("hijack.urls")),
         path("__debug__/", include("debug_toolbar.urls")),
+        path("", include("django_unfold_agentic_layer.urls")),
     ]
     + i18n_patterns(
         path("admin/", admin.site.urls),

@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from os import environ, path
 from pathlib import Path
 
@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     "djangoql",
     "hijack",
     "waffle",
+    "django_unfold_agentic_layer",
     "formula",
     "demo",
 ]
@@ -673,6 +674,32 @@ LOGIN_USERNAME = environ.get("LOGIN_USERNAME")
 LOGIN_PASSWORD = environ.get("LOGIN_PASSWORD")
 
 ############################################################################
+# Agentic layer (MCP at /mcp)
+######################################################################
+UNFOLD_AGENTIC_LAYER = {
+    "PORTAL_TITLE": "Formula Agentic Layer",
+    "SESSION_TTL": timedelta(days=1),
+    # Shared between gunicorn workers, unlike the default LocMem cache.
+    "CONFIRMATION_CACHE": "agentic_layer",
+}
+
+# Dev only: requests without a token act as the first superuser. Ignored when DEBUG is off.
+UNFOLD_AGENTIC_LAYER_UNAUTHORIZED = environ.get("UNFOLD_AGENTIC_LAYER_UNAUTHORIZED") == "1"
+
+CACHES = {
+    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+    "agentic_layer": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": BASE_DIR / ".cache" / "agentic_layer",
+    },
+}
+
+# Behind a TLS-terminating proxy MCP OAuth needs the original https scheme.
+if environ.get("SECURE_PROXY_SSL_HEADER") == "1":
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    USE_X_FORWARDED_HOST = True
+
+######################################################################
 # Debug toolbar
 ############################################################################
 DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: DEBUG}
