@@ -4,7 +4,6 @@ from datetime import date, datetime, time, timedelta
 from os import environ, path
 from pathlib import Path
 
-import sentry_sdk
 from django.core.management.utils import get_random_secret_key
 from django.templatetags.static import static
 from django.urls import reverse_lazy
@@ -63,7 +62,6 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
-    "debug_toolbar",
     "crispy_forms",
     "import_export",
     "guardian",
@@ -88,7 +86,6 @@ if environ.get("UNFOLD_STUDIO") == "1":
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -102,6 +99,11 @@ MIDDLEWARE = [
     "waffle.middleware.WaffleMiddleware",
     "formula.middleware.ReadonlyExceptionHandlerMiddleware",
 ]
+
+# Dev only: debug_toolbar adds ~40 modules to every worker.
+if DEBUG:
+    INSTALLED_APPS.append("debug_toolbar")
+    MIDDLEWARE.insert(2, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
 ######################################################################
 # Sessions
@@ -735,6 +737,8 @@ PLAUSIBLE_DOMAIN = environ.get("PLAUSIBLE_DOMAIN")
 SENTRY_DSN = environ.get("SENTRY_DSN")
 
 if SENTRY_DSN:
+    import sentry_sdk
+
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         enable_tracing=False,
