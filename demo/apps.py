@@ -6,3 +6,7 @@ class DemoConfig(AppConfig):
     name = "demo"
     verbose_name = _("Demo")
     default_auto_field = "django.db.models.BigAutoField"
+
+    def ready(self):
+        # Registers the demo tasks, so the Celery Beat admin lists them
+        from demo import tasks  # noqa: F401
