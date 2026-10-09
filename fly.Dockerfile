@@ -9,7 +9,7 @@ RUN poetry install --only main --no-root --no-interaction \
  && rm -rf /root/.cache .venv/lib/python3.13/site-packages/pip* .venv/bin/pip*
 COPY . .
 RUN python manage.py migrate --noinput \
- && python manage.py loaddata formula/fixtures/* \
+ && LOGIN_PASSWORD=demo python manage.py seed \
  && python manage.py shell -c "from django.contrib.auth import authenticate; authenticate(username='demo', password='demo')" \
  && python manage.py collectstatic --noinput \
  && python -m compileall -q formula demo utils
