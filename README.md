@@ -36,10 +36,10 @@ Run the command below to start the local development server.
 
 ## Loading sample data
 
-After successful installation, database will be empty and there will be no data to observe through the admin area. Unfold provides some sample data available under `formula/fixtures`. These data can be loaded via commands below. It is important to run this command against empty database so primary keys will match.
+After successful installation, database will be empty and there will be no data to observe through the admin area. The `seed` command deletes all data, loads the fixtures from `formula/fixtures` and generates realistic demo data for the `demo` app (catalog, orders, customers, tickets, users, Constance, Waffle, Celery Beat). Login: `demo` / `unfold123`.
 
 ```bash
-docker compose exec web python manage.py loaddata formula/fixtures/*
+docker compose exec web python manage.py seed
 ```
 
 ## Custom Dashboard

@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from datetime import date, datetime, time
 from os import environ, path
 from pathlib import Path
 
@@ -26,6 +27,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
 
+SITE_ID = 1
+
 ######################################################################
 # Domains
 ######################################################################
@@ -48,12 +51,15 @@ INSTALLED_APPS = [
     "unfold.contrib.simple_history",
     "unfold.contrib.forms",
     "unfold.contrib.inlines",
+    "unfold.contrib.hijack",
+    "unfold.contrib.waffle",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.humanize",
+    "django.contrib.sites",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "debug_toolbar",
@@ -65,7 +71,10 @@ INSTALLED_APPS = [
     "django_celery_beat",
     "djmoney",
     "djangoql",
+    "hijack",
+    "waffle",
     "formula",
+    "demo",
 ]
 
 if environ.get("UNFOLD_STUDIO") == "1":
@@ -87,6 +96,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
+    "hijack.middleware.HijackUserMiddleware",
+    "waffle.middleware.WaffleMiddleware",
     "formula.middleware.ReadonlyExceptionHandlerMiddleware",
 ]
 
@@ -244,7 +255,7 @@ UNFOLD = {
     },
     "SITE_TITLE": _("Formula Admin"),
     "SITE_HEADER": _("Formula Admin"),
-    "SITE_SUBHEADER": _("Unfold demo project"),
+    "SITE_SUBHEADER": _("Example demo project"),
     "SITE_SYMBOL": "dashboard",
     "SITE_ICON": lambda request: static("formula/images/logo.svg"),
     # "SITE_URL": None,
@@ -272,7 +283,35 @@ UNFOLD = {
         "en": "🇺🇸",
     },
     "ENVIRONMENT": "formula.utils.environment_callback",
-    "DASHBOARD_CALLBACK": "formula.views.dashboard_callback",
+    "DASHBOARD_CALLBACK": "demo.views.dashboards.dashboard_callback",
+    "SITE_VIEWS": [
+        ("dashboard/system", "dashboard_system", "demo.views.dashboards.SystemView"),
+        (
+            "dashboard/retention",
+            "dashboard_retention",
+            "demo.views.dashboards.RetentionView",
+        ),
+        (
+            "dashboard/commerce",
+            "dashboard_commerce",
+            "demo.views.dashboards.CommerceView",
+        ),
+        (
+            "dashboard/spending",
+            "dashboard_spending",
+            "demo.views.dashboards.SpendingView",
+        ),
+        ("ui/buttons", "ui_buttons", "demo.views.ui.ButtonsView"),
+        ("ui/tables", "ui_tables", "demo.views.ui.TablesView"),
+        ("crispy/vert", "crispy_vertical", "demo.views.crispy.VerticalFormView"),
+        ("crispy/horiz", "crispy_horizontal", "demo.views.crispy.HorizontalFormView"),
+        ("crispy/formset", "crispy_demo_formset", "demo.views.crispy.FormsetView"),
+        (
+            "crispy/autocomplete/products",
+            "crispy_product_autocomplete",
+            "demo.views.crispy.ProductAutocompleteView",
+        ),
+    ],
     "LOGIN": {
         "image": lambda request: static("formula/images/login-bg.jpg"),
         "form": "formula.forms.LoginForm",
@@ -338,13 +377,122 @@ UNFOLD = {
         "command_search": True,
         "navigation": [
             {
-                "title": _("Navigation"),
+                "title": _("Dashboards"),
+                "collapsible": True,
                 "items": [
                     {
-                        "title": _("Dashboard"),
+                        "title": _("Default"),
                         "icon": "dashboard",
                         "link": reverse_lazy("admin:index"),
+                        "active": "demo.callbacks.default_dashboard_active",
                     },
+                    {
+                        "title": _("System"),
+                        "icon": "monitor_heart",
+                        "link": reverse_lazy("admin:dashboard_system"),
+                    },
+                    {
+                        "title": _("Retention"),
+                        "icon": "group_add",
+                        "link": reverse_lazy("admin:dashboard_retention"),
+                    },
+                    {
+                        "title": _("Commerce"),
+                        "icon": "storefront",
+                        "link": reverse_lazy("admin:dashboard_commerce"),
+                    },
+                    {
+                        "title": _("Spending"),
+                        "icon": "payments",
+                        "link": reverse_lazy("admin:dashboard_spending"),
+                    },
+                    {
+                        "title": _("Django"),
+                        "icon": "apps",
+                        "link": lambda request: f"{reverse_lazy('admin:index')}?dashboard=django",
+                        "active": "demo.callbacks.django_dashboard_active",
+                    },
+                ],
+            },
+            {
+                "title": _("Commerce"),
+                "items": [
+                    {
+                        "title": _("Orders"),
+                        "icon": "shopping_cart",
+                        "link": reverse_lazy("admin:demo_order_changelist"),
+                        "badge": "demo.callbacks.orders_badge",
+                    },
+                    {
+                        "title": _("Products"),
+                        "icon": "inventory",
+                        "link": reverse_lazy("admin:demo_product_changelist"),
+                        "badge": "demo.callbacks.products_badge",
+                    },
+                    {
+                        "title": _("Categories"),
+                        "icon": "category",
+                        "link": reverse_lazy("admin:demo_category_changelist"),
+                    },
+                    {
+                        "title": _("Tags"),
+                        "icon": "tag",
+                        "link": reverse_lazy("admin:demo_tag_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("CRM"),
+                "items": [
+                    {
+                        "title": _("Customers"),
+                        "icon": "group",
+                        "link": reverse_lazy("admin:demo_customer_changelist"),
+                    },
+                    {
+                        "title": _("Tickets"),
+                        "icon": "event_note",
+                        "link": reverse_lazy("admin:demo_ticket_changelist"),
+                        "badge": "demo.callbacks.tickets_badge",
+                        "badge_variant": "danger",
+                    },
+                ],
+            },
+            {
+                "title": _("UI Elements"),
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Buttons"),
+                        "icon": "smart_button",
+                        "link": reverse_lazy("admin:ui_buttons"),
+                    },
+                    {
+                        "title": _("Tables"),
+                        "icon": "table",
+                        "link": reverse_lazy("admin:ui_tables"),
+                    },
+                    {
+                        "title": _("Vertical Form"),
+                        "icon": "view_agenda",
+                        "link": reverse_lazy("admin:crispy_vertical"),
+                    },
+                    {
+                        "title": _("Horizontal Form"),
+                        "icon": "view_column",
+                        "link": reverse_lazy("admin:crispy_horizontal"),
+                    },
+                    {
+                        "title": _("Formset"),
+                        "icon": "table_rows",
+                        "link": reverse_lazy("admin:crispy_demo_formset"),
+                    },
+                ],
+            },
+            {
+                "title": _("Formula"),
+                "collapsible": True,
+                "items": [
                     {
                         "title": _("Drivers"),
                         "icon": "sports_motorsports",
@@ -394,17 +542,10 @@ UNFOLD = {
                         "permission": "formula.utils.permission_callback",
                         # "permission": lambda request: request.user.is_superuser,
                     },
-                    {
-                        "title": _("Constance"),
-                        "icon": "settings",
-                        "link": reverse_lazy("admin:constance_config_changelist"),
-                        "badge": _("New"),
-                        "badge_variant": "primary",
-                    },
                 ],
             },
             {
-                "title": _("Users & Groups"),
+                "title": _("Authentication and Authorization"),
                 "collapsible": True,
                 "items": [
                     {
@@ -420,7 +561,7 @@ UNFOLD = {
                 ],
             },
             {
-                "title": _("Celery Tasks"),
+                "title": _("Periodic Tasks"),
                 "collapsible": True,
                 "items": [
                     {
@@ -457,6 +598,49 @@ UNFOLD = {
                         "link": reverse_lazy(
                             "admin:django_celery_beat_solarschedule_changelist"
                         ),
+                    },
+                ],
+            },
+            {
+                "title": _("Waffle"),
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Flags"),
+                        "icon": "flag",
+                        "link": reverse_lazy("admin:waffle_flag_changelist"),
+                    },
+                    {
+                        "title": _("Switches"),
+                        "icon": "toggle_on",
+                        "link": reverse_lazy("admin:waffle_switch_changelist"),
+                    },
+                    {
+                        "title": _("Samples"),
+                        "icon": "percent",
+                        "link": reverse_lazy("admin:waffle_sample_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("Constance"),
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Config"),
+                        "icon": "settings",
+                        "link": reverse_lazy("admin:constance_config_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("Sites"),
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Sites"),
+                        "icon": "language",
+                        "link": reverse_lazy("admin:sites_site_changelist"),
                     },
                 ],
             },
@@ -541,6 +725,9 @@ CONSTANCE_CONFIG = {
     "SITE_CACHE_TTL": (3600, _("Cache TTL in seconds")),
     "SITE_DATE_FORMAT": ("%Y-%m-%d", _("Date format")),
     "SITE_TIME_ZONE": ("UTC", _("Time zone")),
+    "SITE_DATE": (date(2026, 1, 1), _("Launch date")),
+    "SITE_DATETIME": (datetime(2026, 1, 1, 9, 0), _("Launch date and time")),
+    "SITE_TIME": (time(9, 0), _("Daily report time")),
 }
 
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
@@ -586,6 +773,14 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
                 "SITE_DATE_FORMAT",
                 "SITE_TIME_ZONE",
                 "SITE_ANALYTICS_ID",
+            ),
+            # "collapse": True,
+        },
+        "Schedule": {
+            "fields": (
+                "SITE_DATE",
+                "SITE_DATETIME",
+                "SITE_TIME",
             ),
             # "collapse": True,
         },

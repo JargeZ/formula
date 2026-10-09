@@ -1,0 +1,26 @@
+{% extends "demo/dashboards/base.html" %}
+
+{% load i18n unfold %}
+
+{% block dashboard %}
+    <div class="grid gap-8 lg:grid-cols-3">
+        {% trans "Current system health" as title %}
+        {% include "demo/dashboards/progress.html" with items=health %}
+
+        <div class="lg:col-span-2">
+            {% trans "Support load, last 60 days" as title %}
+            {% component "unfold/components/card.html" with title=title %}
+                {% component "unfold/components/tracker.html" with data=tracker class="mb-6" %}{% endcomponent %}
+                {% component "unfold/components/chart/bar.html" with data=tickets_chart height=220 %}{% endcomponent %}
+            {% endcomponent %}
+        </div>
+    </div>
+
+    <div class="grid gap-8 lg:grid-cols-2">
+        {% trans "Periodic tasks" as title %}
+        {% include "demo/dashboards/table.html" with table=tasks %}
+
+        {% trans "Feature flags" as title %}
+        {% include "demo/dashboards/table.html" with table=flags %}
+    </div>
+{% endblock %}

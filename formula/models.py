@@ -8,6 +8,7 @@ from djmoney.models.fields import MoneyField
 from simple_history.models import HistoricalRecords
 
 from formula.encoders import PrettyJSONEncoder
+from utils.models import AuditedModel
 
 
 class DriverStatus(models.TextChoices):
@@ -20,14 +21,6 @@ class DriverCategory(models.TextChoices):
     EXPERIENCED = "EXPERIENCED", _("Experienced")
     VETERAN = "VETERAN", _("Veteran")
     CHAMPION = "CHAMPION", _("Champion")
-
-
-class AuditedModel(models.Model):
-    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
-    modified_at = models.DateTimeField(_("modified at"), auto_now=True)
-
-    class Meta:
-        abstract = True
 
 
 class Tag(AuditedModel):
@@ -53,6 +46,7 @@ class Tag(AuditedModel):
 
 class User(AbstractUser, AuditedModel):
     biography = models.TextField(_("biography"), null=True, blank=True, default=None)
+    location = models.CharField(_("location"), max_length=255, blank=True, default="")
     tags = GenericRelation(Tag)
 
     class Meta:

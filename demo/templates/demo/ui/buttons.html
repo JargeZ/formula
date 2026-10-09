@@ -1,0 +1,44 @@
+{% extends "admin/base_site.html" %}
+
+{% load i18n unfold %}
+
+{% block content %}
+    <div class="flex flex-col gap-8">
+        {% trans "Button styles" as title %}
+        {% component "unfold/components/card.html" with title=title %}
+            <div class="flex flex-col gap-6">
+                <div class="flex flex-row flex-wrap gap-4 items-center">
+                    {% for variant in variants %}
+                        {% component "unfold/components/button.html" with variant=variant %}{{ variant|capfirst }}{% endcomponent %}
+                    {% endfor %}
+                </div>
+
+                <div class="flex flex-row flex-wrap gap-4 items-center">
+                    {% for size in sizes %}
+                        {% component "unfold/components/button.html" with size=size icon="bolt" %}{% trans "Size" %} {{ size }}{% endcomponent %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endcomponent %}
+
+        {% trans "Form button styles" as title %}
+        {% component "unfold/components/card.html" with title=title %}
+            <form method="get" class="flex flex-row flex-wrap gap-4 items-center">
+                {% component "unfold/components/button.html" with submit=1 icon="save" %}{% trans "Save" %}{% endcomponent %}
+                {% component "unfold/components/button.html" with type="reset" variant="default" %}{% trans "Reset" %}{% endcomponent %}
+                {% component "unfold/components/button.html" with submit=1 variant="danger" icon="delete" %}{% trans "Delete" %}{% endcomponent %}
+            </form>
+        {% endcomponent %}
+
+        {% trans "Link button styles" as title %}
+        {% component "unfold/components/card.html" with title=title %}
+            <div class="flex flex-row flex-wrap gap-4 items-center">
+                {% url "admin:demo_order_changelist" as orders_url %}
+                {% url "admin:demo_product_changelist" as products_url %}
+                {% component "unfold/components/button.html" with href=orders_url icon="shopping_cart" %}{% trans "Orders" %}{% endcomponent %}
+                {% component "unfold/components/button.html" with href=products_url variant="default" icon="inventory" %}{% trans "Products" %}{% endcomponent %}
+                {% component "unfold/components/link.html" with href="https://unfoldadmin.com/docs/" external=1 %}{% trans "Documentation" %}{% endcomponent %}
+            </div>
+        {% endcomponent %}
+    </div>
+{% endblock %}

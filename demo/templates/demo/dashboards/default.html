@@ -1,0 +1,27 @@
+{% load i18n unfold %}
+
+{% component "unfold/components/navigation.html" with items=dashboards class="mb-8 w-fit" %}{% endcomponent %}
+
+<div class="flex flex-col gap-8">
+    {% include "demo/dashboards/kpis.html" %}
+
+    <div class="grid gap-8 lg:grid-cols-3">
+        {% trans "Current retention progress" as title %}
+        {% include "demo/dashboards/progress.html" with items=progress %}
+
+        <div class="lg:col-span-2">
+            {% trans "Customer cohorts" as title %}
+            {% component "unfold/components/card.html" with title=title %}
+                {% component "unfold/components/chart/cohort.html" with data=cohort %}{% endcomponent %}
+            {% endcomponent %}
+        </div>
+    </div>
+
+    <div class="grid gap-8 lg:grid-cols-2">
+        {% trans "Top earnings" as title %}
+        {% include "demo/dashboards/table.html" with table=top_customers %}
+
+        {% trans "Recent orders" as title %}
+        {% include "demo/dashboards/table.html" with table=recent_orders %}
+    </div>
+</div>

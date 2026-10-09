@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+
+{% load i18n unfold %}
+
+{% block content %}
+    <div class="flex flex-col gap-8">
+        {% trans "Tables" as title %}
+        {% component "unfold/components/table.html" with table=product_table title=title %}{% endcomponent %}
+
+        <div class="grid gap-8 lg:grid-cols-2">
+            {% trans "Card Included With Size md" as title %}
+            {% component "unfold/components/card.html" with title=title size="md" %}
+                {% component "unfold/components/table.html" with table=customer_table card_included=1 card_size="md" %}{% endcomponent %}
+            {% endcomponent %}
+
+            {% trans "Card Included" as title %}
+            {% component "unfold/components/card.html" with title=title %}
+                {% component "unfold/components/table.html" with table=customer_table card_included=1 striped=1 %}{% endcomponent %}
+            {% endcomponent %}
+        </div>
+    </div>
+{% endblock %}

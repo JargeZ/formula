@@ -1,0 +1,4 @@
+{# Unfold ships bar/line templates only; the same chart.js also renders pie, doughnut and radar #}
+<div class="relative w-full">
+    <canvas class="chart" data-type="{{ type }}" data-value="{{ data }}" height="{{ height|default:300 }}"></canvas>
+</div>

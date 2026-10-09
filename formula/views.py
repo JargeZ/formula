@@ -81,17 +81,3 @@ class CrispyFormsetView(UnfoldModelAdminViewMixin, FormView):
             }
         )
         return context
-
-
-def dashboard_callback(request, context):
-    """
-    Here you can pass additional variables to the dashboard
-    """
-
-    # context.update(
-    #     {
-    #         "sample_variable": "sample_value",
-    #     }
-    # )
-
-    return context

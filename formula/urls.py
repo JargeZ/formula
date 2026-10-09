@@ -10,6 +10,7 @@ urlpatterns = (
     [
         path("", HomeView.as_view(), name="home"),
         path("i18n/", include("django.conf.urls.i18n")),
+        path("hijack/", include("hijack.urls")),
         path("__debug__/", include("debug_toolbar.urls")),
     ]
     + i18n_patterns(

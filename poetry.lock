@@ -343,6 +343,26 @@ files = [
 django = ">=3.2"
 
 [[package]]
+name = "django-hijack"
+version = "3.7.9"
+description = "Enable users to hijack (=login as) and work on behalf of another user."
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "django_hijack-3.7.9-py3-none-any.whl", hash = "sha256:76e451842684ad79ea27e79a1dea60518c845d239656c90735c2c5c6eb2f78a3"},
+    {file = "django_hijack-3.7.9.tar.gz", hash = "sha256:b43fb47b2501e230a7343aaae94e1748ee628a16161916e1edc83a52b3924347"},
+]
+
+[package.dependencies]
+django = ">=4.2"
+
+[package.extras]
+docs = ["mkdocs (==1.6.1)"]
+lint = ["msgcheck (==4.2.0)", "ruff (==0.16.9)"]
+test = ["pytest", "pytest-cov", "pytest-django"]
+
+[[package]]
 name = "django-import-export"
 version = "4.3.14"
 description = "Django application and library for importing and exporting data with included admin integration."
@@ -454,6 +474,24 @@ type = "git"
 url = "https://github.com/unfoldadmin/django-unfold.git"
 reference = "HEAD"
 resolved_reference = "38ea3ad5d3d6a5c85bfdb2db9af5d2780e79788a"
+
+[[package]]
+name = "django-waffle"
+version = "5.0.0"
+description = "A feature flipper for Django."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "django_waffle-5.0.0-py3-none-any.whl", hash = "sha256:3312851d9d926b76b9e90712355781700a383b82b5bf2b61e1f1be97532c0f3d"},
+    {file = "django_waffle-5.0.0.tar.gz", hash = "sha256:62f9d00eedf68dafb82657beab56e601bddedc1ea1ccfef91d83df8658708509"},
+]
+
+[package.dependencies]
+django = ">=4.2"
+
+[package.extras]
+docs = ["sphinx", "sphinx-rtd-theme"]
 
 [[package]]
 name = "djangoql"
@@ -959,4 +997,4 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "7f08b80daa83edd373bf4649ae300a89761060a8a0d2b396a3175094c78c39ff"
+content-hash = "44dda37d3ce3db729d9f18e0be0cc3fcc8161151757afec0fcba0c648bedd7d5"

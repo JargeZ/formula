@@ -1,0 +1,13 @@
+{% extends "admin/base_site.html" %}
+
+{% load i18n unfold %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+    {% component "unfold/components/navigation.html" with items=dashboards class="mb-8 w-fit" %}{% endcomponent %}
+
+    <div class="flex flex-col gap-8">
+        {% block dashboard %}{% endblock %}
+    </div>
+{% endblock %}

@@ -1,0 +1,5 @@
+{% load unfold %}
+
+{% component "unfold/components/card.html" with title=title %}
+    {% component "unfold/components/table.html" with table=table card_included=1 striped=1 %}{% endcomponent %}
+{% endcomponent %}
