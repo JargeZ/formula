@@ -1,3 +1,4 @@
+import shutil
 from collections import OrderedDict
 from datetime import date, datetime, time, timedelta
 from os import environ, path
@@ -144,7 +145,17 @@ DATABASES = {
 DATABASE_READONLY = environ.get("DATABASE_READONLY") == "1"
 
 if DATABASE_READONLY:
-    DATABASES["default"]["NAME"] = f"file:{DATABASES['default']['NAME']}?mode=ro&immutable=1"
+    baked_database = DATABASES["default"]["NAME"]
+    DATABASES["default"]["NAME"] = f"file:{baked_database}?mode=ro&immutable=1"
+
+    # MCP OAuth must store clients and tokens, so the agentic layer gets a writable
+    # copy of the whole database (tokens reference auth_user). A newer image replaces it.
+    agentic_database = Path("/tmp/agentic_layer.sqlite")
+    if not agentic_database.exists() or agentic_database.stat().st_mtime < baked_database.stat().st_mtime:
+        shutil.copyfile(baked_database, agentic_database)
+
+    DATABASES["agentic_layer"] = {"ENGINE": "django.db.backends.sqlite3", "NAME": agentic_database}
+    DATABASE_ROUTERS = ["formula.routers.AgenticLayerRouter"]
 
 ######################################################################
 # Authentication

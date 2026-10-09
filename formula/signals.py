@@ -5,8 +5,9 @@ from django.dispatch import receiver
 from formula.exceptions import ReadonlyException
 
 
-def prevent_modifications(sender, instance, **kwargs):
-    if settings.DATABASE_READONLY and sender._meta.db_table != "studio_options":
+def prevent_modifications(sender, instance, using, **kwargs):
+    # Only the baked default database is read-only; agentic_layer is a writable copy.
+    if settings.DATABASE_READONLY and using == "default" and sender._meta.db_table != "studio_options":
         raise ReadonlyException(
             "Database is operating in readonly mode. Not possible to save any data."
         )
