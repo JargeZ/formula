@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -62,6 +63,12 @@ class TagRelation(models.Model):
         return str(self.tag)
 
 
+# Fields from demo/translation.py. modeltranslation adds `<field>_<lang>` columns after
+# simple_history built HistoricalProduct, so history must skip them.
+# ponytail: history keeps only the default-language value of these fields.
+PRODUCT_TRANSLATED_FIELDS = ["name", "description", "specification"]
+
+
 class ProductStatus(models.TextChoices):
     ACTIVE = "active", _("Active")
     INACTIVE = "inactive", _("Inactive")
@@ -98,7 +105,13 @@ class Product(AuditedModel):
     discontinued_at = models.DateTimeField(_("discontinued at"), null=True, blank=True)
     is_active = models.BooleanField(_("active"), default=True)
     tags = GenericRelation(TagRelation)
-    history = HistoricalRecords()
+    history = HistoricalRecords(
+        excluded_fields=[
+            f"{field}_{code}"
+            for field in PRODUCT_TRANSLATED_FIELDS
+            for code, _label in settings.LANGUAGES
+        ]
+    )
 
     class Meta:
         verbose_name = _("product")

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from guardian.admin import GuardedModelAdmin
 from unfold.admin import ModelAdmin
 from unfold.decorators import action, display
 from unfold.widgets import UnfoldAdminTextareaWidget
@@ -18,7 +19,7 @@ TICKET_STATUS_LABELS = {
 
 
 @admin.register(Ticket)
-class TicketAdmin(ModelAdmin):
+class TicketAdmin(GuardedModelAdmin, ModelAdmin):
     list_display = [
         "name",
         "customer",

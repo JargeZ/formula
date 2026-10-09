@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from djangoql.admin import DjangoQLSearchMixin
+from modeltranslation.admin import TabbedTranslationAdmin
 from simple_history.admin import SimpleHistoryAdmin
 from unfold.admin import GenericTabularInline, ModelAdmin, TabularInline
 from unfold.contrib.filters.admin import (
@@ -46,7 +47,7 @@ DEFAULT_DATASET = {"name": "John Doe", "email": "john@example.com", "age": 32}
 
 
 @admin.register(Category)
-class CategoryAdmin(ImportExportAdmin):
+class CategoryAdmin(ImportExportAdmin, TabbedTranslationAdmin):
     list_display = ["name", "slug", "display_active"]
     search_fields = ["name", "slug"]
     prepopulated_fields = {"slug": ["name"]}
@@ -59,7 +60,7 @@ class CategoryAdmin(ImportExportAdmin):
 
 
 @admin.register(Tag)
-class TagAdmin(ModelAdmin):
+class TagAdmin(ModelAdmin, TabbedTranslationAdmin):
     list_display = ["name", "slug"]
     search_fields = ["name", "slug"]
     prepopulated_fields = {"slug": ["name"]}
@@ -126,7 +127,9 @@ class ProductAdminForm(forms.ModelForm):
 
 
 @admin.register(Product)
-class ProductAdmin(DjangoQLSearchMixin, SimpleHistoryAdmin, ImportExportAdmin):
+class ProductAdmin(
+    DjangoQLSearchMixin, SimpleHistoryAdmin, ImportExportAdmin, TabbedTranslationAdmin
+):
     form = ProductAdminForm
     list_display = [
         "name",

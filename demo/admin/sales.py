@@ -3,6 +3,7 @@ from django.db.models import Count
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from djangoql.admin import DjangoQLSearchMixin
+from guardian.admin import GuardedModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 from unfold.admin import StackedInline, TabularInline
 from unfold.contrib.filters.admin import (
@@ -56,7 +57,7 @@ class CustomerOrderInline(StackedInline):
 
 
 @admin.register(Customer)
-class CustomerAdmin(DjangoQLSearchMixin, ImportExportAdmin):
+class CustomerAdmin(DjangoQLSearchMixin, GuardedModelAdmin, ImportExportAdmin):
     list_display = ["display_header", "phone", "country", "display_orders"]
     search_fields = ["first_name", "last_name", "email", "phone", "city"]
     inlines = [CustomerOrderInline]

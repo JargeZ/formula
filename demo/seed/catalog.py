@@ -108,6 +108,43 @@ TAGS = {
     "Bundle": "Comes with useful extras.",
 }
 
+# German translations for modeltranslation fields: name -> (name, description)
+CATEGORIES_DE = {
+    "Laptops": ("Laptops", "Tragbare Computer für Arbeit und Freizeit."),
+    "Smartphones": ("Smartphones", "Telefone mit neuesten Kameras und Chips."),
+    "Audio": ("Audio", "Kopfhörer, Ohrhörer und Lautsprecher."),
+    "Wearables": ("Wearables", "Uhren und Fitness-Tracker."),
+    "Home Office": ("Homeoffice", "Möbel und Zubehör für produktive Tage."),
+    "Gaming": ("Gaming", "Konsolen, Controller und Zubehör."),
+    "Smart Home": ("Smart Home", "Vernetzte Geräte für jeden Raum."),
+    "Photography": ("Fotografie", "Kameras, Objektive und Stative."),
+    "Networking": ("Netzwerk", "Router, Mesh-Systeme und Switches."),
+    "Accessories": ("Zubehör", "Kabel, Ladegeräte und Hüllen."),
+}
+
+TAGS_DE = {
+    "Bestseller": ("Bestseller", "Die meistverkauften Produkte der Saison."),
+    "New Arrival": ("Neuheit", "Kürzlich ins Sortiment aufgenommen."),
+    "Eco Friendly": ("Umweltfreundlich", "Aus recycelten Materialien hergestellt."),
+    "Limited Edition": ("Limitierte Edition", "Nur solange der Vorrat reicht."),
+    "Gift Idea": ("Geschenkidee", "Beliebte Wahl für Geschenke."),
+    "Premium": ("Premium", "Spitzenqualität und hochwertige Materialien."),
+    "Budget": ("Preiswert", "Viel Leistung fürs Geld."),
+    "Wireless": ("Kabellos", "Funktioniert ohne Kabel."),
+    "Refurbished": ("Generalüberholt", "Geprüfte Gebrauchtware."),
+    "Clearance": ("Abverkauf", "Letzte Preisreduzierungen."),
+    "Staff Pick": ("Team-Tipp", "Von unserem Team empfohlen."),
+    "Bundle": ("Paket", "Mit nützlichen Extras."),
+}
+
+COLORS = {
+    "Black": "Schwarz",
+    "Silver": "Silber",
+    "White": "Weiß",
+    "Graphite": "Graphit",
+    "Blue": "Blau",
+}
+
 STATUS_WEIGHTS = {
     ProductStatus.ACTIVE: 70,
     ProductStatus.OUT_OF_STOCK: 10,
@@ -118,18 +155,27 @@ STATUS_WEIGHTS = {
 
 
 def seed_catalog():
-    categories = [
-        Category.objects.create(
-            name=name,
+    # Both languages are set explicitly: `name=` would only fill the active one
+    categories = {
+        name: Category.objects.create(
+            name_en=name,
+            name_de=CATEGORIES_DE[name][0],
             slug=slugify(name),
-            description=paragraphs(description),
+            description_en=paragraphs(description),
+            description_de=paragraphs(CATEGORIES_DE[name][1]),
             is_active=name != "Photography",
         )
         for name, (description, *_) in CATEGORIES.items()
-    ]
+    }
 
     tags = [
-        Tag.objects.create(name=name, slug=slugify(name), description=paragraphs(text))
+        Tag.objects.create(
+            name_en=name,
+            name_de=TAGS_DE[name][0],
+            slug=slugify(name),
+            description_en=paragraphs(text),
+            description_de=paragraphs(TAGS_DE[name][1]),
+        )
         for name, text in TAGS.items()
     ]
 
@@ -137,8 +183,9 @@ def seed_catalog():
     products = []
 
     while len(products) < PRODUCT_COUNT:
-        category = rng.choice(categories)
-        _, nouns, (low, high) = CATEGORIES[category.name]
+        key = rng.choice(list(categories))
+        category = categories[key]
+        _, nouns, (low, high) = CATEGORIES[key]
         name = f"{rng.choice(BRANDS)} {rng.choice(nouns)} {rng.choice(MODELS)}"
 
         if name in used_names:
@@ -148,22 +195,34 @@ def seed_catalog():
         status = weighted(STATUS_WEIGHTS)
         released_at = timezone.localdate() - timedelta(days=rng.randint(-30, 900))
         price = Decimal(rng.randint(low, high)) - Decimal("0.01")
+        weight, warranty = rng.randint(50, 4000), rng.choice([12, 24, 36])
+        color = rng.choice(list(COLORS))
 
         products.append(
             Product(
-                name=name,
+                name_en=name,
+                name_de=name,
                 price=price,
                 price_currency="EUR",
                 status=status,
                 category=category,
-                description=paragraphs(
-                    f"The {name} is part of our {category.name.lower()} range.",
+                description_en=paragraphs(
+                    f"The {name} is part of our {key.lower()} range.",
                     "Designed for everyday use with a two year warranty included.",
                 ),
-                specification=paragraphs(
-                    f"Weight: {rng.randint(50, 4000)} g",
-                    f"Warranty: {rng.choice([12, 24, 36])} months",
-                    f"Color: {rng.choice(['Black', 'Silver', 'White', 'Graphite', 'Blue'])}",
+                description_de=paragraphs(
+                    f"{name} gehört zu unserem Sortiment {CATEGORIES_DE[key][0]}.",
+                    "Für den täglichen Einsatz, inklusive zwei Jahren Garantie.",
+                ),
+                specification_en=paragraphs(
+                    f"Weight: {weight} g",
+                    f"Warranty: {warranty} months",
+                    f"Color: {color}",
+                ),
+                specification_de=paragraphs(
+                    f"Gewicht: {weight} g",
+                    f"Garantie: {warranty} Monate",
+                    f"Farbe: {COLORS[color]}",
                 ),
                 dataset={
                     "name": rng.choice(BRANDS) + " Supplier",

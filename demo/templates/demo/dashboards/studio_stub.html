@@ -1,0 +1,17 @@
+{% load i18n unfold %}
+
+{# Placeholder shown when the commercial unfold_studio package is not installed #}
+{% component "unfold/components/card.html" with class="mb-8" %}
+    <div class="flex flex-col gap-4 md:flex-row md:items-center">
+        <div class="grow">
+            {% component "unfold/components/title.html" %}{% trans "Unfold Studio dashboards" %}{% endcomponent %}
+            {% component "unfold/components/text.html" %}
+                {% trans "Retention, system, commerce and spending dashboard templates are part of the Unfold Studio package." %}
+            {% endcomponent %}
+        </div>
+
+        {% component "unfold/components/button.html" with href="https://unfoldadmin.com/studio/" icon="add_shopping_cart" %}
+            {% trans "Purchase Unfold Studio" %}
+        {% endcomponent %}
+    </div>
+{% endcomponent %}

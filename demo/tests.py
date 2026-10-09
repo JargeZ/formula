@@ -1,8 +1,10 @@
 from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import translation
 
-from demo.models import Order, OrderStatus, Product
+from demo.models import Category, Order, OrderStatus, Product, Ticket
+from formula.models import User
 
 PAGES = [
     "admin:index",
@@ -75,3 +77,22 @@ class SeededAdminTests(TestCase):
         self.client.get(reverse("admin:demo_product_rebuild_index", args=[product.pk]))
         product.refresh_from_db()
         self.assertIn("indexed_at", product.dataset)
+
+    def test_category_is_translated(self):
+        category = Category.objects.get(slug="photography")
+        with translation.override("de"):
+            self.assertEqual(category.name, "Fotografie")
+        with translation.override("en"):
+            self.assertEqual(category.name, "Photography")
+
+    def test_agent_has_object_permissions_only_for_own_tickets(self):
+        agent = User.objects.get(username="anna.kovac")
+        own = Ticket.objects.filter(assigned_to=agent).first()
+        other = Ticket.objects.exclude(assigned_to=agent).first()
+        self.assertTrue(agent.has_perm("demo.change_ticket", own))
+        self.assertFalse(agent.has_perm("demo.change_ticket", other))
+
+    def test_object_permissions_page(self):
+        ticket = Ticket.objects.first()
+        url = reverse("admin:demo_ticket_permissions", args=[ticket.pk])
+        self.assertEqual(self.client.get(url).status_code, 200)

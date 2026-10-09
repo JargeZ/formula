@@ -1,6 +1,7 @@
 from django.utils import timezone
+from guardian.shortcuts import assign_perm
 
-from demo.models import Ticket, TicketStatus
+from demo.models import Customer, Ticket, TicketStatus
 from utils.seed import past, rng, weighted
 
 TICKET_COUNT = 48
@@ -67,3 +68,12 @@ def seed_support(orders, agents):
     for ticket, created_at in zip(tickets, dates, strict=True):
         ticket.created_at = ticket.modified_at = created_at
     Ticket.objects.bulk_update(tickets, ["created_at", "modified_at"])
+
+    # django-guardian: each agent may view and change only their own tickets
+    # and view the customers behind them
+    for agent in agents:
+        own = Ticket.objects.filter(assigned_to=agent)
+        customers = Customer.objects.filter(ticket__in=own).distinct()
+        for perm in ("demo.view_ticket", "demo.change_ticket"):
+            assign_perm(perm, agent, own)
+        assign_perm("demo.view_customer", agent, customers)
