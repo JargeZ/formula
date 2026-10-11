@@ -891,7 +891,7 @@ pydantic = ">=2.0"
 type = "git"
 url = "https://github.com/JargeZ/django-unfold-agentic-layer.git"
 reference = "HEAD"
-resolved_reference = "7bc9884b32fb01b7011f9cdad065879ecb865504"
+resolved_reference = "0346ba019fa49380e4dc72e14eb128cc0efff18e"
 subdirectory = "packages/django-unfold-agentic-layer"
 
 [[package]]
