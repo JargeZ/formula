@@ -19,6 +19,7 @@ from waffle.models import Flag, Sample, Switch
 from utils.seed import paragraphs, past, rng
 
 DEMO_USERNAME = "demo"
+AGENT_USERNAME = "agent"
 # Matches the prefilled login form when LOGIN_PASSWORD is set (fly demo)
 DEMO_PASSWORD = settings.LOGIN_PASSWORD or "unfold123"
 
@@ -27,6 +28,26 @@ GROUPS = {
     "Sales": ["order", "orderitem", "customer"],
     "Catalog managers": ["product", "category", "tag", "tagrelation"],
     "Support": ["ticket", "customer"],
+}
+
+# Agent group: almost everything except users and a few destructive actions
+AGENT_EXCLUDE_MODELS = {
+    ("formula", "user"),
+    ("formula", "profile"),
+    ("auth", "group"),
+    ("auth", "permission"),
+    ("guardian", "groupobjectpermission"),
+    ("guardian", "userobjectpermission"),
+}
+AGENT_EXCLUDE_CODENAMES = {
+    "delete_oauthclient",
+    "delete_oauthtoken",
+    "delete_site",
+    "delete_session",
+    "delete_contenttype",
+    "delete_logentry",
+    "delete_periodictask",
+    "delete_periodictasks",
 }
 
 # username, first, last, location, group
@@ -40,8 +61,20 @@ STAFF = [
 ]
 
 
+def _agent_permissions():
+    allowed = []
+    for perm in Permission.objects.select_related("content_type"):
+        ct = perm.content_type
+        if (ct.app_label, ct.model) in AGENT_EXCLUDE_MODELS:
+            continue
+        if perm.codename in AGENT_EXCLUDE_CODENAMES:
+            continue
+        allowed.append(perm.pk)
+    return Permission.objects.filter(pk__in=allowed)
+
+
 def seed_users():
-    """Demo superuser plus a small staff team. Returns the staff users."""
+    """Demo superuser, Agent staff user, plus a small staff team."""
     User = get_user_model()
 
     groups = {}
@@ -54,6 +87,10 @@ def seed_users():
         )
         groups[name] = group
 
+    agent_group = Group.objects.create(name="Agent")
+    agent_group.permissions.set(_agent_permissions())
+    groups["Agent"] = agent_group
+
     demo, _ = User.objects.get_or_create(
         username=DEMO_USERNAME, defaults={"email": "demo@example.com"}
     )
@@ -63,6 +100,22 @@ def seed_users():
     demo.location = "Bratislava, Slovakia"
     demo.biography = paragraphs("Administrator account of the demo project.")
     demo.save()
+
+    agent = User.objects.create_user(
+        username=AGENT_USERNAME,
+        password=DEMO_PASSWORD,
+        email="agent@example.com",
+        first_name="Agent",
+        last_name="User",
+        location="Remote",
+        biography=paragraphs(
+            "Non-superuser staff account for connecting AI agents over MCP."
+        ),
+        is_staff=True,
+        is_active=True,
+        last_login=past(1),
+    )
+    agent.groups.add(agent_group)
 
     staff = []
     for username, first, last, location, group in STAFF:
@@ -81,6 +134,13 @@ def seed_users():
         if group:
             user.groups.add(groups[group])
         staff.append(user)
+
+    use_mcp = Permission.objects.get(
+        content_type__app_label="django_unfold_agentic_layer",
+        codename="use_mcp",
+    )
+    for user in User.objects.all():
+        user.user_permissions.add(use_mcp)
 
     return staff
 
