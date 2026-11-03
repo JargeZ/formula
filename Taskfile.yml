@@ -26,8 +26,6 @@ tasks:
     cmds:
       - poetry run python manage.py migrate --noinput
       - poetry run python manage.py seed
-    status:
-      - test -f database.sqlite
 
   test:
     desc: Run tests (DEBUG is required, otherwise the database is readonly)

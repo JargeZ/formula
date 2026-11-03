@@ -14,7 +14,7 @@ console_command = '/code/manage.py shell'
   ALLOWED_HOSTS = 'django-formula-admin-agentic.fly.dev'
   CSRF_TRUSTED_ORIGINS = 'https://django-formula-admin-agentic.fly.dev'
   LOGIN_USERNAME = 'demo'
-  LOGIN_PASSWORD = 'demo'
+  LOGIN_PASSWORD = 'unfold123'
   # Fly terminates TLS; MCP OAuth needs the original https scheme.
   SECURE_PROXY_SSL_HEADER = '1'
 

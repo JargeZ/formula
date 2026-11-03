@@ -229,6 +229,7 @@ def dashboard_callback(request, context):
         cohort=cohort(),
         top_customers=top_customers(),
         recent_orders=recent_orders(),
+        mcp_url=request.build_absolute_uri("/mcp/"),
     )
     return context
 

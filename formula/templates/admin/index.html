@@ -23,6 +23,10 @@
 {% block content %}
     {% include "unfold/helpers/messages.html" %}
 
+    {% if not request.GET.dashboard %}
+        {% include "formula/mcp_intro.html" %}
+    {% endif %}
+
     {% if studio_installed %}
         {% if request.GET.dashboard == "retention" %}
             {% include "unfold_studio/dashboards/retention.html" %}

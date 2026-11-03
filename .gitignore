@@ -17,3 +17,6 @@ unfold_studio
 docker-compose.dev.yml
 .cache/
 *.md
+!README.md
+!AGENTS.md
+!CLAUDE.md

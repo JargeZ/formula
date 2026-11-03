@@ -1,0 +1,133 @@
+{% load i18n unfold %}
+
+{% component "unfold/components/card.html" with class="mb-8" %}
+    <div class="flex flex-col gap-6">
+        <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div class="grow">
+                {% component "unfold/components/title.html" %}{% trans "Connect an AI agent over MCP" %}{% endcomponent %}
+                {% component "unfold/components/text.html" %}
+                    {% blocktrans trimmed %}
+                        This admin is also an MCP server. Add it to Claude Code (or any HTTP MCP client),
+                        authenticate with the same staff login you used here, and the agent gets your models,
+                        filters, actions and permissions.
+                    {% endblocktrans %}
+                {% endcomponent %}
+            </div>
+            <div class="flex flex-col gap-2 text-sm">
+                <a href="https://code.claude.com/docs/en/mcp" class="text-primary-600 dark:text-primary-500" target="_blank" rel="noopener">
+                    {% trans "Claude Code MCP" %}
+                </a>
+                <a href="https://cursor.com/docs/mcp" class="text-primary-600 dark:text-primary-500" target="_blank" rel="noopener">
+                    {% trans "Cursor MCP" %}
+                </a>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-2">
+                <span class="font-semibold text-important">{% trans "Claude Code" %}</span>
+                {% with cmd_id="mcp-claude-cmd" %}
+                    <div class="bg-base-50 border border-base-200 flex gap-0 items-stretch overflow-hidden rounded-default dark:bg-base-800 dark:border-base-700">
+                        <pre class="grow m-0 overflow-x-auto px-4 py-3 text-sm"><code id="{{ cmd_id }}">claude mcp add --transport http unfold-mcp-demo "{{ mcp_url }}"</code></pre>
+                        <button
+                            type="button"
+                            class="border-l border-base-200 cursor-pointer flex gap-1 items-center px-3 text-sm text-subtle hover:text-important dark:border-base-700"
+                            data-copy-target="{{ cmd_id }}"
+                            data-copy-label="{% trans 'Copy' %}"
+                            data-copied-label="{% trans 'Copied' %}"
+                        >
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                            <span data-copy-label-text>{% trans "Copy" %}</span>
+                        </button>
+                    </div>
+                {% endwith %}
+                <span class="text-sm text-subtle">
+                    {% blocktrans trimmed %}
+                        Then run <code>/mcp</code>, choose Authenticate, and sign in with
+                        <code>demo</code> / <code>unfold123</code> (this demo) or your local staff user.
+                    {% endblocktrans %}
+                </span>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <span class="font-semibold text-important">{% trans "MCP endpoint URL" %}</span>
+                {% with cmd_id="mcp-url" %}
+                    <div class="bg-base-50 border border-base-200 flex gap-0 items-stretch overflow-hidden rounded-default dark:bg-base-800 dark:border-base-700">
+                        <pre class="grow m-0 overflow-x-auto px-4 py-3 text-sm"><code id="{{ cmd_id }}">{{ mcp_url }}</code></pre>
+                        <button
+                            type="button"
+                            class="border-l border-base-200 cursor-pointer flex gap-1 items-center px-3 text-sm text-subtle hover:text-important dark:border-base-700"
+                            data-copy-target="{{ cmd_id }}"
+                            data-copy-label="{% trans 'Copy' %}"
+                            data-copied-label="{% trans 'Copied' %}"
+                        >
+                            <span class="material-symbols-outlined text-base">content_copy</span>
+                            <span data-copy-label-text>{% trans "Copy" %}</span>
+                        </button>
+                    </div>
+                {% endwith %}
+                <span class="text-sm text-subtle">
+                    {% trans "Paste into any MCP client that supports remote HTTP servers with OAuth." %}
+                </span>
+            </div>
+        </div>
+
+        <div class="border-t border-base-200 flex flex-col gap-3 pt-4 dark:border-base-700">
+            {% component "unfold/components/title.html" %}{% trans "In this admin" %}{% endcomponent %}
+            {% component "unfold/components/text.html" %}
+                {% blocktrans trimmed %}
+                    After agents connect, you can inspect and revoke their access here:
+                {% endblocktrans %}
+            {% endcomponent %}
+            <ul class="flex flex-col gap-2 list-none m-0 p-0 text-sm">
+                <li>
+                    <a href="{% url 'admin:django_unfold_agentic_layer_oauthclient_changelist' %}" class="text-primary-600 dark:text-primary-500">
+                        {% trans "MCP clients" %}
+                    </a>
+                    — {% blocktrans trimmed %}
+                        registered clients (Claude Code, Cursor, …). Deleting a client revokes all of its tokens.
+                    {% endblocktrans %}
+                </li>
+                <li>
+                    <a href="{% url 'admin:django_unfold_agentic_layer_oauthtoken_changelist' %}" class="text-primary-600 dark:text-primary-500">
+                        {% trans "MCP access tokens" %}
+                    </a>
+                    — {% blocktrans trimmed %}
+                        each approved login (user, client, scopes, expiry). Deleting a row revokes that session.
+                    {% endblocktrans %}
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endcomponent %}
+
+<script>
+(function () {
+    document.querySelectorAll("[data-copy-target]").forEach(function (button) {
+        button.addEventListener("click", function () {
+            var target = document.getElementById(button.getAttribute("data-copy-target"));
+            if (!target) return;
+            var label = button.querySelector("[data-copy-label-text]");
+            var done = function () {
+                if (!label) return;
+                label.textContent = button.getAttribute("data-copied-label") || "Copied";
+                setTimeout(function () {
+                    label.textContent = button.getAttribute("data-copy-label") || "Copy";
+                }, 1500);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(target.textContent.trim()).then(done);
+            } else {
+                var range = document.createRange();
+                range.selectNodeContents(target);
+                var selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+                document.execCommand("copy");
+                selection.removeAllRanges();
+                done();
+            }
+        });
+    });
+})();
+</script>

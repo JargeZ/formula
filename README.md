@@ -19,13 +19,13 @@ The project is a fork of the Unfold sample project "Formula" with extra demo dat
 | Admin UI | <https://django-formula-admin-agentic.fly.dev/admin/> |
 | MCP endpoint | `https://django-formula-admin-agentic.fly.dev/mcp/` |
 | Login | `demo` |
-| Password | `demo` |
+| Password | `unfold123` |
 
 The login form is pre-filled with these credentials.
 
 ## Connect an agent over MCP
 
-The MCP server uses the HTTP transport with OAuth: the agent opens the demo login page in the browser and you sign in with `demo` / `demo`.
+The MCP server uses the HTTP transport with OAuth: the agent opens the demo login page in the browser and you sign in with `demo` / `unfold123`.
 
 ### Claude Code
 
@@ -37,14 +37,14 @@ Then authorize:
 
 1. Start `claude` and run `/mcp`.
 2. Select `unfold-mcp-demo` and choose **Authenticate**.
-3. A browser window opens with the demo login page. Sign in with `demo` / `demo` and allow access.
+3. A browser window opens with the demo login page. Sign in with `demo` / `unfold123` and allow access.
 4. Go back to Claude Code. The server shows as connected and its tools and resources are available.
 
 Try a prompt like *"Using unfold-mcp-demo, list the races at Monza after 2020 and who won them"*.
 
 ### Other MCP clients
 
-Any client that supports remote MCP servers over HTTP with OAuth works. Add the server URL `https://django-formula-admin-agentic.fly.dev/mcp/` and complete the same browser login with `demo` / `demo`.
+Any client that supports remote MCP servers over HTTP with OAuth works. Add the server URL `https://django-formula-admin-agentic.fly.dev/mcp/` and complete the same browser login with `demo` / `unfold123`.
 
 ## What the agent can do
 
